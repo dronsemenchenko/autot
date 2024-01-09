@@ -60,10 +60,11 @@ USER ${USERNAME}
 
 # copy source files
 COPY --chown=${USERNAME}:${USERNAME} . $APP_HOME/
+RUN chmod +x $APP_HOME/docker/dev/fill-db.sh
 
 # install all PHP dependencies
 RUN if [ "$BUILD_ARGUMENT_ENV" = "dev" ] || [ "$BUILD_ARGUMENT_ENV" = "test" ]; then COMPOSER_MEMORY_LIMIT=-1 composer install --optimize-autoloader --no-interaction --no-progress; \
     else export APP_ENV=$BUILD_ARGUMENT_ENV && COMPOSER_MEMORY_LIMIT=-1 composer install --optimize-autoloader --no-interaction --no-progress --no-dev; \
     fi
- 
+
 USER root
