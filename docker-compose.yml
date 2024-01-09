@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+
+    nginx:
+      image: autot-nginx:latest
+      build:
+        context: ./docker/
+        args:
+          BUILD_ARGUMENT_ENV: dev
+        dockerfile: ./nginx/Dockerfile
+      container_name: autot-nginx
+      restart: always
+      ports:
+        - "8080:80"
+      volumes:
+        - ./:/var/www/:ro,cached
+      depends_on:
+        - autot
+      networks:
+        - autot
+
+    autot:
+      build:
+        context: .
+        args:
+          BUILD_ARGUMENT_ENV: dev
+        dockerfile: ./Dockerfile
+      container_name: autot-symfony
+      volumes:
+        - ./:/var/www/:cached
+      depends_on:
+        - mysql
+      networks:
+        - autot
+        
+    mysql:
+      image: mysql:8.0.35
+      platform: linux/x86_64
+      container_name: autot-mysql
+      command: --innodb-use-native-aio=${INNODB_USE_NATIVE_AIO:-1} --sql_mode=${SQL_MODE:-"ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"}
+      environment:
+        MYSQL_ROOT_PASSWORD: secret
+        MYSQL_DATABASE: autot
+      ports:
+        - "8306:3306"
+      volumes:
+        - ./docker/dev/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+      networks:
+        - autot
+
+networks:
+  autot:
+    name: autot
