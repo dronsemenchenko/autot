@@ -1,3 +1,3 @@
-docker-compose up -d
-docker exec -it autot-symfony sh ./docker/dev/fill-db.sh
-docker exec -it autot-symfony php bin/phpunit
+docker-compose up -d<br>
+docker exec -it autot-symfony sh ./docker/dev/fill-db.sh<br>
+docker exec -it autot-symfony php bin/phpunit<br>
